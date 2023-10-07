@@ -38,7 +38,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 //    public static final String USER_LOGIN_STATE = "userLoginState";
 
     @Override
-    public long userRegister(String userAccount, String userPassword, String checkPassword) {
+    public long userRegister(String userAccount, String userPassword, String checkPassword, String userMail) {
         // 1.校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             // todo 抛出异常 封装异常
@@ -117,27 +117,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User safetyUser = getSafetyUser(user);
         // 4. 记录登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
-        return user;
+        return safetyUser;
     }
-
+    /**
+     * 用户登出
+     * @param request
+     * @return
+     */
+    @Override
+    public int userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return 1;
+    }
     /**
      * 用户脱敏
      */
     @Override
-    public User getSafetyUser(User user) {
+    public User getSafetyUser(User originuser) {
+        if (originuser == null) {
+            return null;
+        }
         User safetyUser = new User();
-        safetyUser.setId(user.getId());
-        safetyUser.setUserAccount(user.getUserAccount());
-        safetyUser.setAvatarUrl(user.getAvatarUrl());
-        safetyUser.setGender(user.getGender());
-        safetyUser.setPhone(user.getPhone());
-        safetyUser.setEmail(user.getEmail());
-        safetyUser.setUserStatus(user.getUserStatus());
-        safetyUser.setCreatetime(user.getCreatetime());
-        safetyUser.setUpdatetime(user.getUpdatetime());
-        safetyUser.setIsDelete(user.getIsDelete());
-        safetyUser.setUsername(user.getUsername());
-        safetyUser.setUserrole(user.getUserrole());
+        safetyUser.setId(originuser.getId());
+        safetyUser.setUserAccount(originuser.getUserAccount());
+        safetyUser.setAvatarUrl(originuser.getAvatarUrl());
+        safetyUser.setGender(originuser.getGender());
+        safetyUser.setPhone(originuser.getPhone());
+        safetyUser.setEmail(originuser.getEmail());
+        safetyUser.setUserStatus(originuser.getUserStatus());
+        safetyUser.setCreatetime(originuser.getCreatetime());
+        safetyUser.setUpdatetime(originuser.getUpdatetime());
+        safetyUser.setIsDelete(originuser.getIsDelete());
+        safetyUser.setUsername(originuser.getUsername());
+        safetyUser.setUserRole(originuser.getUserRole());
         return safetyUser;
     }
 }

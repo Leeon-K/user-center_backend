@@ -78,7 +78,12 @@ public class User implements Serializable {
     /**
      * 0-管理员 1-普通用户
      */
-    private Integer userrole;
+    private Integer userRole;
+
+    /**
+     * 用户mail
+     */
+    private String userMail;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
