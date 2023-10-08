@@ -18,13 +18,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
+    /**
+     * 业务异常
+     * @param e
+     * @return
+     */
     @ExceptionHandler(BusinessException.class)
     public BaseResponse<?> businessExceptionHandler(BusinessException e) {
         log.error("businessException: " + e.getMessage(), e);
         return ResultUtils.error(e.getCode(), e.getMessage(), e.getDescription());
     }
-
+    /**
+     * 系统内部异常
+     * @param e
+     * @return
+     */
     @ExceptionHandler(RuntimeException.class)
     public BaseResponse<?> runtimeExceptionHandler(RuntimeException e) {
         log.error("runtimeException", e);

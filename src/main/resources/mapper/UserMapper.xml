@@ -17,7 +17,8 @@
             <result property="updatetime" column="updatetime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="INTEGER"/>
             <result property="username" column="username" jdbcType="VARCHAR"/>
-            <result property="userrole" column="userrole" jdbcType="INTEGER"/>
+            <result property="userRole" column="userrole" jdbcType="VARCHAR"/>
+            <result property="vipCode" column="vipCode" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -25,6 +26,6 @@
         gender,userPassword,phone,
         email,userStatus,createtime,
         updatetime,isDelete,username,
-        userrole
+        userrole,vipCode
     </sql>
 </mapper>

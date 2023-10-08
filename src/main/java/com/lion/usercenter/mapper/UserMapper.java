@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 * @createDate 2023-10-06 09:03:28
 * @Entity generator.domain.User
 */
-// 没有MAPPER注解，会报错,因为没有实现类
+// 10/06 踩大坑！！没有MAPPER注解，会报错,因为没有实现类
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 

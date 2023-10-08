@@ -16,5 +16,5 @@ public interface UserConstant {
      * 权限
      */
     int Default_role = 0;
-    int ADMIN_ROLE = 1;
+    String ADMIN_ROLE = "admin";
 }

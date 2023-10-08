@@ -16,9 +16,10 @@ public interface UserService extends IService<User> {
      * @param userAccount 用户账号
      * @param userPassword 用户密码
      * @param checkPassword 确认密码
+     * @param vipCode vip码
      * @return
      */
-    long userRegister(String userAccount, String userPassword, String checkPassword, String userMail);
+    long userRegister(String userAccount, String userPassword, String checkPassword, String vipCode);
 
     /**
      * 用户登录
@@ -30,6 +31,7 @@ public interface UserService extends IService<User> {
     User userLogin(String userAccount, String userPassword, HttpServletRequest request);
     /**
      * 用户登出
+     *
      * @param request
      * @return
      */
@@ -38,4 +40,11 @@ public interface UserService extends IService<User> {
      * 用户脱敏
      */
     User getSafetyUser(User user);
+
+    /**
+     * 用户信息修改
+     * @param user
+     * @return
+     */
+    int userUpdate(User user);
 }

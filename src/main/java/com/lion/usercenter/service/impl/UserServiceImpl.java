@@ -2,6 +2,8 @@ package com.lion.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lion.usercenter.common.ErrorCode;
+import com.lion.usercenter.exception.BusinessException;
 import com.lion.usercenter.mapper.UserMapper;
 import com.lion.usercenter.model.domain.User;
 import com.lion.usercenter.service.UserService;
@@ -38,43 +40,60 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 //    public static final String USER_LOGIN_STATE = "userLoginState";
 
     @Override
-    public long userRegister(String userAccount, String userPassword, String checkPassword, String userMail) {
+    public long userRegister(String userAccount, String userPassword, String checkPassword, String vipCode) {
         // 1.校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            // todo 抛出异常 封装异常
-            return -1;
+            // done 抛出异常 封装异常
+            throw new BusinessException(ErrorCode.NULL_ERROR, "用戶名密码为空");
         }
         if (userAccount.length() < 4) {
-            return -2;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短,至少4位");
         }
         if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            return -3;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码过短,至少8位");
         }
         if (!userPassword.equals(checkPassword)) {
-            return -4;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入密码不一致");
         }
         // 验证特殊字符
         String validPattern = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()) {
-            return -5;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名不能包含特殊字符");
         }
         // 校验账户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userAccount", userAccount);
         long count = this.count(queryWrapper);
         if (count > 0) {
-            return -6;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号已存在");
         }
+        if (vipCode != null && !vipCode.isEmpty()) {
+            // 校验vipcode
+            if (vipCode.length() > 9) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "vip码过长");
+            }
+            }
+            QueryWrapper<User> queryWrapper_vipcode = new QueryWrapper<>();
+            queryWrapper_vipcode.eq("vipCode", vipCode);
+            long count_v = this.count(queryWrapper_vipcode);
+            if (count_v > 0) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "vip码已被使用");
+            }
         // 2.加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         // 3.插入数据库
         User user = new User();
         user.setUserAccount(userAccount);
+        // 默认用户名为账户
+        user.setUsername(userAccount);
+        // 默认头像
+        user.setAvatarUrl("https://tse3-mm.cn.bing.net/th/id/OIP-C.3Pfd2kdG6S8b0JBZefXR6gAAAA?pid=ImgDet&rs=1");
         user.setUserPassword(encryptPassword);
+        user.setVipCode(vipCode);
         boolean saveResult = this.save(user);
         if (!saveResult) {
-            return -7;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "注册失败, 恭喜你发现了一个未知bug");
         }
         return user.getId();
     }
@@ -121,6 +140,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
     /**
      * 用户登出
+     *
      * @param request
      * @return
      */
@@ -150,7 +170,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setIsDelete(originuser.getIsDelete());
         safetyUser.setUsername(originuser.getUsername());
         safetyUser.setUserRole(originuser.getUserRole());
+        safetyUser.setVipCode(originuser.getVipCode());
         return safetyUser;
+    }
+
+    /**
+     * 用户信息修改
+     * @param user
+     * @return
+     */
+    @Override
+    public int userUpdate(User user) {
+
+        return 0;
     }
 }
 

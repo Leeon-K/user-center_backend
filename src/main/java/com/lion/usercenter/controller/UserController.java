@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.lion.usercenter.constant.UserConstant.ADMIN_ROLE;
@@ -41,11 +42,11 @@ public class UserController {
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
-        String userMail = userRegisterRequest.getUserMail();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword, userMail)) {
+        String vipCode = userRegisterRequest.getVipCode();
+        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             return null;
         }
-        long result = userService.userRegister(userAccount, userPassword, checkPassword, userMail);
+        long result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
         return ResultUtils.success(result);
     }
 
@@ -141,7 +142,7 @@ public class UserController {
         // 仅管理员可查询
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
-        return user != null && user.getUserRole() == ADMIN_ROLE;
+        return user != null && Objects.equals(user.getUserRole(), ADMIN_ROLE);
     }
 
 }
