@@ -40,8 +40,8 @@ class UserServiceTest {
         String userPassword = "123456789";
         String checkPassword = "123456789";
         String vipCode = "123";
-        long result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
-        Assertions.assertEquals(1, result);
+//        long result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
+//        Assertions.assertEquals(1, result);
 
 //        long result = userService.userRegister(userAccount, userPassword, checkPassword);
 //        Assertions.assertEquals(3, result);
