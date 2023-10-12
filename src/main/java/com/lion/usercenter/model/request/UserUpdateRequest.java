@@ -1,23 +1,24 @@
-package com.lion.usercenter.model.domain;
+package com.lion.usercenter.model.request;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-
 /**
- * 用户
- * @TableName user
+ * 用户更新请求体
+ *
+ * @Author: Lion
+ * @Date: 2023/10/12/19:07
+ * @Description:
  */
-@TableName(value ="user")
 @Data
-public class User implements Serializable {
-    /**
-     * 主键
-     */
-    @TableId(type = IdType.AUTO)
+public class UserUpdateRequest implements Serializable {
     private Long id;
+    /**
+     * 用户昵称
+     */
+    private String username;
 
     /**
      * 账号
@@ -25,12 +26,12 @@ public class User implements Serializable {
     private String userAccount;
 
     /**
-     * 头像
+     * 用户头像
      */
     private String avatarUrl;
 
     /**
-     * 性别
+     * 性别 男 女
      */
     private String gender;
 
@@ -50,40 +51,31 @@ public class User implements Serializable {
     private String email;
 
     /**
-     * 账号状态
+     * 状态  0-正常 1-注销 2-封号
      */
     private Integer userStatus;
 
-    /**
-     * 时间
-     */
-    private Date createtime;
 
     /**
      * 更新时间
      */
-    private Date updatetime;
+    private Date updateTime;
 
     /**
-     * 删除是否
+     * 是否删除  逻辑删除
      */
+    @TableLogic
     private Integer isDelete;
 
     /**
-     * 用户名
+     * user-普通用户 admin-管理员 ban-封号
      */
-    private String username;
+    private String userRole;
 
     /**
-     * admin-管理员  user-普通用户
-     */
-    private String userrole;
-
-    /**
-     * "用户vip编号"
+     * vipCode
      */
     private String vipCode;
 
-    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

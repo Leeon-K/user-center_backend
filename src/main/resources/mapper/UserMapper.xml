@@ -8,7 +8,7 @@
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="userAccount" column="userAccount" jdbcType="VARCHAR"/>
             <result property="avatarUrl" column="avatarUrl" jdbcType="VARCHAR"/>
-            <result property="gender" column="gender" jdbcType="TINYINT"/>
+            <result property="gender" column="gender" jdbcType="VARCHAR"/>
             <result property="userPassword" column="userPassword" jdbcType="VARCHAR"/>
             <result property="phone" column="phone" jdbcType="VARCHAR"/>
             <result property="email" column="email" jdbcType="VARCHAR"/>
@@ -17,7 +17,7 @@
             <result property="updatetime" column="updatetime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="INTEGER"/>
             <result property="username" column="username" jdbcType="VARCHAR"/>
-            <result property="userRole" column="userrole" jdbcType="VARCHAR"/>
+            <result property="userrole" column="userrole" jdbcType="VARCHAR"/>
             <result property="vipCode" column="vipCode" jdbcType="VARCHAR"/>
     </resultMap>
 

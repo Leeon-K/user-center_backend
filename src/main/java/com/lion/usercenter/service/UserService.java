@@ -2,6 +2,7 @@ package com.lion.usercenter.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lion.usercenter.model.domain.User;
+import com.lion.usercenter.model.request.UserUpdatePasswordRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,9 +43,18 @@ public interface UserService extends IService<User> {
     User getSafetyUser(User user);
 
     /**
+     * 当前用户登录状态
+     * @param request
+     * @return
+     */
+    User getLoginUser(HttpServletRequest request);
+
+    /**
      * 用户信息修改
      * @param user
      * @return
      */
-    int userUpdate(User user);
+    int userUpdate(User user, HttpServletRequest request);
+
+    boolean updatePassword(UserUpdatePasswordRequest updatePasswordRequest, HttpServletRequest request);
 }

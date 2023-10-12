@@ -1,4 +1,4 @@
-package com.lion.usercenter.model.domain.request;
+package com.lion.usercenter.model.request;
 
 import lombok.Data;
 

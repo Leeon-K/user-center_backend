@@ -6,16 +6,15 @@ import com.lion.usercenter.common.ErrorCode;
 import com.lion.usercenter.common.ResultUtils;
 import com.lion.usercenter.exception.BusinessException;
 import com.lion.usercenter.model.domain.User;
-import com.lion.usercenter.model.domain.request.UserLoginRequest;
-import com.lion.usercenter.model.domain.request.UserRegisterRequest;
+import com.lion.usercenter.model.request.*;
 import com.lion.usercenter.service.UserService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.lion.usercenter.constant.UserConstant.ADMIN_ROLE;
@@ -26,7 +25,6 @@ public class UserController {
 
     @Resource
     private UserService userService;
-
     /**
      * 用户注册
      *
@@ -105,7 +103,81 @@ public class UserController {
         User safetyUser = userService.getSafetyUser(user);
         return ResultUtils.success(safetyUser);
     }
+    /**
+     * 管理员update用户信息
+     * @param userUpdateRequest
+     * @param request
+     */
+    @PostMapping("/update")
+    public BaseResponse<Long> userUpdate(@RequestBody UserUpdateRequest userUpdateRequest
+            , HttpServletRequest request) {
+        if (!isAdmin(request)) {
+            throw new BusinessException(ErrorCode.NO_AUTH, "");
+        }
+        if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = new User();
+        BeanUtils.copyProperties(userUpdateRequest, user);
+        boolean result = userService.updateById(user);
+        if (!result) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "修改失败");
+        }
+        return ResultUtils.success(user.getId());
+    }
 
+    /**
+     * 用户自己更新个人信息
+     *
+     * @param userUpdateMyRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/update/my")
+    public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
+                                              HttpServletRequest request) {
+        if (userUpdateMyRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"请求为空");
+        }
+        User loginUser = userService.getLoginUser(request);
+        User user = new User();
+        BeanUtils.copyProperties(userUpdateMyRequest, user);
+        user.setId(loginUser.getId());
+        boolean result = userService.updateById(user);
+        if (!result){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"修改失败");
+        }
+        return ResultUtils.success(result);
+    }
+
+    /** 修改密码
+     * @param updatePasswordRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/update/password")
+    public BaseResponse<Boolean> updatePassword(@RequestBody UserUpdatePasswordRequest updatePasswordRequest,
+                                                HttpServletRequest request) {
+        if (updatePasswordRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"请求为空");
+        }
+        boolean updateUserPassword = userService.updatePassword(updatePasswordRequest, request);
+        if (updateUserPassword) {
+            return ResultUtils.success(true);
+        } else {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"修改失败");
+        }
+    }
+
+
+
+    /**
+     * 管理员查询用户
+     *
+     * @param username
+     * @param request
+     * @return
+     */
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
         if (!isAdmin(request)) {
@@ -120,16 +192,47 @@ public class UserController {
         return ResultUtils.success(list);
     }
 
-    @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
+
+    /**
+     * 管理员创建用户
+     *
+     * @param userAddRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/add")
+    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
         if (!isAdmin(request)) {
-            throw new BusinessException(ErrorCode.NO_AUTH);
+            throw new BusinessException(ErrorCode.NO_AUTH, "无权限");
         }
-        if (id <= 0) {
+        if (userAddRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        User user = new User();
+        BeanUtils.copyProperties(userAddRequest, user);
+        boolean result = userService.save(user);
+        if (!result) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "创建失败");
+        }
+        return ResultUtils.success(user.getId());
+    }
+
+    /**
+     * 管理员删除用户
+     * @param id
+     * @param request
+     * @return
+     */
+    @PostMapping("/delete")
+    public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest deleteRequest, @RequestBody long id, HttpServletRequest request) {
+        if (!isAdmin(request)) {
+            throw new BusinessException(ErrorCode.NO_AUTH, "无权限");
+        }
+        if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean b = userService.removeById(id);
-        return ResultUtils.success(b);
+        boolean removeUser = userService.removeById(deleteRequest.getId());
+        return ResultUtils.success(removeUser);
     }
 
     /**
@@ -139,10 +242,9 @@ public class UserController {
      * @return
      */
     private boolean isAdmin(HttpServletRequest request) {
-        // 仅管理员可查询
+        // 管理员校验
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
-        return user != null && Objects.equals(user.getUserRole(), ADMIN_ROLE);
+        return user != null && user.getUserrole().equals(ADMIN_ROLE);
     }
-
 }

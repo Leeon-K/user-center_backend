@@ -19,7 +19,7 @@ class UserServiceTest {
         user.setId(0L);
         user.setUserAccount("domin");
         user.setAvatarUrl("https://tse3-mm.cn.bing.net/th/id/OIP-C.3Pfd2kdG6S8b0JBZefXR6gAAAA?pid=ImgDet&rs=1");
-        user.setGender(0);
+        user.setGender("男");
         user.setUserPassword("123456");
         user.setPhone("123");
         user.setEmail("345");

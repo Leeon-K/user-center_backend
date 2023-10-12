@@ -6,9 +6,11 @@ import com.lion.usercenter.common.ErrorCode;
 import com.lion.usercenter.exception.BusinessException;
 import com.lion.usercenter.mapper.UserMapper;
 import com.lion.usercenter.model.domain.User;
+import com.lion.usercenter.model.request.UserUpdatePasswordRequest;
 import com.lion.usercenter.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -26,8 +28,7 @@ import static com.lion.usercenter.constant.UserConstant.USER_LOGIN_STATE;
  */
 @Service
 @Slf4j
-public class UserServiceImpl extends ServiceImpl<UserMapper, User>
-        implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Resource
     private UserMapper userMapper;
     /**
@@ -37,7 +38,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     /**
      * 用户登录态
      */
-//    public static final String USER_LOGIN_STATE = "userLoginState";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword, String vipCode) {
@@ -124,7 +124,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             log.info("user login failed, user Account doesn't exist");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号不存在");
         }
-        // 2.加密
+        // 2. md5加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         queryWrapper.eq("userPassword", encryptPassword);
         User user = userMapper.selectOne(queryWrapper);
@@ -169,23 +169,78 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUpdatetime(originuser.getUpdatetime());
         safetyUser.setIsDelete(originuser.getIsDelete());
         safetyUser.setUsername(originuser.getUsername());
-        safetyUser.setUserRole(originuser.getUserRole());
+        safetyUser.setUserrole(originuser.getUserrole());
         safetyUser.setVipCode(originuser.getVipCode());
         return safetyUser;
     }
 
     /**
-     * 用户信息修改
-     * @param user
+     * 获取当前登录用户
+     *
+     * @param request
      * @return
      */
     @Override
-    public int userUpdate(User user) {
+    public User getLoginUser(HttpServletRequest request) {
+        // 判断登录状态
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
+        }
+        // 查询用户
+        long userId = currentUser.getId();
+        currentUser = this.getById(userId);
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        }
+        return currentUser;
+    }
 
+    /**
+     * 管理员更新用户
+     *
+     * @param user
+     * @param request
+     * @return
+     */
+    @Override
+    public int userUpdate(User user, HttpServletRequest request) {
         return 0;
     }
+
+    /**
+     * 更新密码
+     *
+     * @param updatePasswordRequest
+     * @param request
+     * @return
+     */
+    @Override
+    public boolean updatePassword(UserUpdatePasswordRequest updatePasswordRequest, HttpServletRequest request) {
+        if (updatePasswordRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = getLoginUser(request);
+        Long userId = loginUser.getId();
+        if (userId < 0 || userId == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        }
+        User user = new User();
+        BeanUtils.copyProperties(updatePasswordRequest, user);
+        user.setId(loginUser.getId());
+
+        // 使用 MD5 加密新密码
+        String encryptedPassword = DigestUtils.md5DigestAsHex((SALT + updatePasswordRequest.getNewPassword()).getBytes());
+        user.setUserPassword(encryptedPassword);
+        if (encryptedPassword.equals(updatePasswordRequest.getUserPassword())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "修改密码不能相同");
+        }
+        boolean result = updateById(user);
+        if (!result) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "修改密码失败");
+        }
+        return true;
+    }
+
 }
-
-
-
-
