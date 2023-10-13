@@ -6,6 +6,7 @@ import com.lion.usercenter.common.ErrorCode;
 import com.lion.usercenter.exception.BusinessException;
 import com.lion.usercenter.mapper.UserMapper;
 import com.lion.usercenter.model.domain.User;
+import com.lion.usercenter.model.request.UserSearchRequest;
 import com.lion.usercenter.model.request.UserUpdatePasswordRequest;
 import com.lion.usercenter.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -243,4 +245,67 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return true;
     }
 
+    /**
+     * 分页查询
+     * @param searchRequest
+     * @return
+     */
+    @Override
+    public QueryWrapper<User> getQueryWrapper(UserSearchRequest searchRequest)  {
+
+        if (searchRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        String username = searchRequest.getUsername();
+        String userAccount = searchRequest.getUserAccount();
+        String gender = searchRequest.getGender();
+        String phone = searchRequest.getPhone();
+        String email = searchRequest.getEmail();
+        Integer userStatus = searchRequest.getUserStatus();
+        String userRole = searchRequest.getUserrole();
+        String vipCode = searchRequest.getUserCode();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        Date updateTime = searchRequest.getUpdateTime();
+        Date createTime = searchRequest.getCreateTime();
+        // username
+        if (StringUtils.isNotBlank(username)) {
+            queryWrapper.like("username", username);
+        }
+        // userAccount
+        if (StringUtils.isNotBlank(userAccount)) {
+            queryWrapper.like("userAccount", userAccount);
+        }
+        // gender
+        if (StringUtils.isNotBlank(username)) {
+            queryWrapper.eq("gender", gender);
+        }
+        // phone
+        if (StringUtils.isNotBlank(phone)) {
+            queryWrapper.like("phone", phone);
+        }
+        // email
+        if (StringUtils.isNotBlank(email)) {
+            queryWrapper.like("email", email);
+        }
+        // userStatus
+        if (userStatus != null) {
+            queryWrapper.eq("userStatus", userStatus);
+        }
+
+        if (StringUtils.isNotBlank(userRole)) {
+            queryWrapper.eq("userRole", userRole);
+        }
+
+        if (StringUtils.isNotBlank(vipCode)) {
+            queryWrapper.eq("userCode", vipCode);
+        }
+
+        if (updateTime != null) {
+            queryWrapper.like("updateTime", updateTime);
+        }
+        if (createTime != null) {
+            queryWrapper.like("createTime", createTime);
+        }
+        return queryWrapper;
+    }
 }

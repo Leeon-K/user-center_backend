@@ -62,7 +62,7 @@ public class UserSearchRequest extends PageRequest implements Serializable {
     /**
      * user-普通用户 admin-管理员 ban-封号
      */
-    private String userRole;
+    private String userrole;
 
     /**
      * 用户编号

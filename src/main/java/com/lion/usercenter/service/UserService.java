@@ -1,7 +1,9 @@
 package com.lion.usercenter.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lion.usercenter.model.domain.User;
+import com.lion.usercenter.model.request.UserSearchRequest;
 import com.lion.usercenter.model.request.UserUpdatePasswordRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,4 +59,12 @@ public interface UserService extends IService<User> {
     int userUpdate(User user, HttpServletRequest request);
 
     boolean updatePassword(UserUpdatePasswordRequest updatePasswordRequest, HttpServletRequest request);
+
+    /**
+     * 分页条件
+     * @param searchRequest
+     * @return
+     */
+    QueryWrapper<User> getQueryWrapper(UserSearchRequest searchRequest);
+
 }
