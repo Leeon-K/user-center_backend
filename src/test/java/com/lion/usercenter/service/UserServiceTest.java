@@ -40,18 +40,18 @@ class UserServiceTest {
         String userPassword = "123456789";
         String checkPassword = "123456789";
         String vipCode = "123";
-//        long result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
-//        Assertions.assertEquals(1, result);
+        long result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
+        Assertions.assertEquals(1, result);
 
-//        long result = userService.userRegister(userAccount, userPassword, checkPassword);
-//        Assertions.assertEquals(3, result);
-//        userAccount = "11";
-//        result = userService.userRegister(userAccount, userPassword, checkPassword);
-//        Assertions.assertEquals(-2, result);
-//        userAccount = "admin3";
-//        userPassword = "123";
-//        result = userService.userRegister(userAccount, userPassword, checkPassword);
-//        Assertions.assertEquals(-3, result);
+        result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
+        Assertions.assertEquals(3, result);
+        userAccount = "11";
+        result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
+        Assertions.assertEquals(-2, result);
+        userAccount = "admin3";
+        userPassword = "123";
+        result = userService.userRegister(userAccount, userPassword, checkPassword, vipCode);
+        Assertions.assertEquals(-3, result);
 
     }
 }

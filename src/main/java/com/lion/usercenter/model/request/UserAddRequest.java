@@ -44,7 +44,22 @@ public class UserAddRequest {
     /**
      * 用户角色: user, admin
      */
-    private String userRole;
+    private String userrole;
+
+    /**
+     * 电话
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 性别
+     */
+    private String gender;
 
     private static final long serialVersionUID = 1L;
 

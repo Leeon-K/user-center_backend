@@ -10,6 +10,7 @@ import com.lion.usercenter.model.request.*;
 import com.lion.usercenter.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -18,8 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.lion.usercenter.constant.UserConstant.ADMIN_ROLE;
-import static com.lion.usercenter.constant.UserConstant.USER_LOGIN_STATE;
+import static com.lion.usercenter.constant.UserConstant.*;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -251,6 +252,9 @@ public class UserController {
         }
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);
+        // 加密密码
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + user.getUserPassword()).getBytes());
+        user.setUserPassword(encryptPassword);
         boolean result = userService.save(user);
         if (!result) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "创建失败");

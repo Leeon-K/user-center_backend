@@ -17,4 +17,6 @@ public interface UserConstant {
      */
     int Default_role = 0;
     String ADMIN_ROLE = "admin";
+
+    String SALT = "lion";
 }
